@@ -6,6 +6,19 @@ int parse_params (int argc, char **argv, int numtags, tag* t)
 	printf("Given %d possible parameters\n", argc-1);
 	printf("Looking for %d tags\n", numtags);
 
+	/* Check validity of tags */
+	for (ii=0; ii<numtags; ii++)
+	{
+		if (strcmp(t[ii].name,"")==0)
+			return TAGERR_NAME;
+		if (t[ii].type > TAGTYPE_STRING)
+			return TAGERR_TYPE;
+		if (t[ii].type == TAGTYPE_STRING || t[ii].type == TAGTYPE_FLOAT || t[ii].type == TAGTYPE_INT)
+			if (t[ii].data == NULL)
+				return TAGERR_DATA;
+	}
+
+	/* Loop through command to find tags */
 	count = 0;
 	for (ii=1; ii<argc; ii++)
 	{
