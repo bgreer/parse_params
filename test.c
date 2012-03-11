@@ -8,10 +8,12 @@ int main (int argc, char **argv)
 	/* initialize a struct with that to look for */
 	tag t[3];
 
+	int flag;
 	t[0].name = "-m";
 	t[0].type = TAGTYPE_BOOL;
+	t[0].data = &flag;
 
-	char filename[50];
+	char filename[10];
 	t[1].name = "-file";
 	t[1].type = TAGTYPE_STRING;
 	t[1].data = filename;
@@ -24,6 +26,8 @@ int main (int argc, char **argv)
 	returnval = parse_params(argc, argv, 3, t);
 
 	printf("\nreturn value = %d\n", returnval);
+
+	printf("\n%d\n%s\n%f\n", flag, filename, init);
 
 	return EXIT_SUCCESS;
 }

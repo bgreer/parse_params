@@ -3,8 +3,6 @@
 int parse_params (int argc, char **argv, int numtags, tag* t)
 {
 	int ii, ij, status, count;
-	printf("Given %d possible parameters\n", argc-1);
-	printf("Looking for %d tags\n", numtags);
 
 	/* Check validity of tags */
 	for (ii=0; ii<numtags; ii++)
@@ -13,23 +11,22 @@ int parse_params (int argc, char **argv, int numtags, tag* t)
 			return TAGERR_NAME;
 		if (t[ii].type > TAGTYPE_STRING)
 			return TAGERR_TYPE;
-		if (t[ii].type == TAGTYPE_STRING || t[ii].type == TAGTYPE_FLOAT || t[ii].type == TAGTYPE_INT)
-			if (t[ii].data == NULL)
-				return TAGERR_DATA;
+		if (t[ii].data == NULL)
+			return TAGERR_DATA;
 	}
 
 	/* Loop through command to find tags */
 	count = 0;
 	for (ii=1; ii<argc; ii++)
 	{
-		printf("parsing '%s'\n", argv[ii]);
+		/* Loop through each provided tag */
 		for (ij=0; ij<numtags; ij++)
 		{
+			/* Check parameter against tag */
 			if (strcmp(t[ij].name, argv[ii])==0)
 			{
-				printf("match found\n");
 				status = parse_params_action(argv, ii, t[ij]);
-				if (status<0) return -1;
+				if (status<0) return status;
 				ii += status;
 				ij = numtags;
 				count++;
@@ -39,6 +36,7 @@ int parse_params (int argc, char **argv, int numtags, tag* t)
 	return count;
 }
 
+/* Given a match of tag t and argv[ii], do something */
 int parse_params_action (char **argv, int ii, tag t)
 {
 	int skip;
@@ -46,18 +44,21 @@ int parse_params_action (char **argv, int ii, tag t)
 	switch (t.type)
 	{
 		case TAGTYPE_BOOL:
-			printf("\tboolean\n");
+			*((int*)t.data) = 1;
 			break;
 		case TAGTYPE_INT:
-			printf("\tinteger\n");
+			if (argv[ii+1]==NULL) return PARSE_ERROR;
+			*((int*)t.data) = atoi(argv[ii+1]);
 			skip = 1;
 			break;
 		case TAGTYPE_FLOAT:
-			printf("\tfloat\n");
+			if (argv[ii+1]==NULL) return PARSE_ERROR;
+			*((float*)t.data) = atof(argv[ii+1]);
 			skip = 1;
 			break;
 		case TAGTYPE_STRING:
-			printf("\tstring\n");
+			if (argv[ii+1]==NULL) return PARSE_ERROR;
+			strcpy((char*)t.data, argv[ii+1]);
 			skip = 1;
 			break;
 	}
